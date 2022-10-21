@@ -7,7 +7,8 @@ See LICENSE in the project root for license information.
 
 #>
 
-####################################################
+###################################################
+
 
 function Get-AuthToken {
 
@@ -266,7 +267,13 @@ function Get-AuthToken {
         foreach($MD in $ManagedDevices){
         write-host "Attempting Scan on Device $($MD.deviceName) with ID : $($MD.id)" -ForegroundColor Yellow
         
-        Invoke-DeviceManagement_ManagedDevices_WindowsDefenderScan -managedDeviceId $MD.id -quickscan $false
+        #Invoke-DeviceManagement_ManagedDevices_WindowsDefenderScan -managedDeviceId $MD.id -quickScan $true
+		$graphApiVersion = "Beta"
+		$Resource  = "deviceManagement/managedDevices/$($MD.id)/windowsDefenderScan"
+		$uri = "https://graph.microsoft.com/$graphApiVersion/$($Resource)"
+		$Body = @{"quickScan" = "true"}
+		$JSONBody = $Body | ConvertTo-JSON
+		Invoke-RestMethod -Uri $uri -Headers $authToken -Method Post -Body $JSONBody
         }
     }
     else
